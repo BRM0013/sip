@@ -1,0 +1,21 @@
+@font-face {
+    font-family: Gabriola;
+    src: url('../font/Gabriola.ttf');
+}
+
+@font-face {
+    font-family: Georgia;
+    src: url('../font/georgia.ttf');
+}
+
+@font-face {
+    font-family: Akronim;
+    src: url('../font/Akronim.ttf');
+}
+
+.main-header .logo {
+	padding-top: 5px;
+	font-family: Gabriola;
+	font-size: 38px !important;
+	font-style: italic;
+}
