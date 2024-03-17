@@ -19,6 +19,7 @@ use App\Models\MasterData\JenisPersyaratan;
 use App\Models\MasterData\TemplateSurat;
 use App\Models\MasterData\JenisSarana;
 use App\Models\SuratDiluar;
+use App\Models\MasterData\FormatSurat;
 use App\Models\MasterData\MasterTtdKadinkes;
 use App\Models\MasterData\Fasyankes;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -58,11 +59,11 @@ class SuratController extends Controller{
     // return $request->id_surat;
     $data['surat'] = Surat::find($request->id_surat);
     $data['users'] = isset($request->id_surat) ? Users::find($data['surat']->id_user) : Users::find(Auth::getUser()->id);
-
     $data['jenis_surat'] = isset($data['surat']) ? JenisSurat::find($data['surat']->id_jenis_surat) : JenisSurat::find(Auth::getUser()->id_jenis_surat);
     $data['list_surat'] = Surat::where('id_user', $data['users']->id)->where('status_aktif', 'Aktif')->orWhere('status_aktif', 'Menunggu')->where('id_user', $data['users']->id)->get();
     $data['list_jenis_sarana'] = JenisSarana::all();
     $data['list_fasyankes']           = Fasyankes::all();
+    $data['format_surat'] = FormatSurat::find($request->id_format_surat);
 
     if($request->jenis== 'perpanjangan'){
       $data['perpanjangan'] = '/perpanjangan';
@@ -102,7 +103,22 @@ class SuratController extends Controller{
       $data['pencabutan_pindah'] = 'false';
     }
 
-    $data['berkas_persyaratan'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
+    // Menyiapkan data berkas persyaratan
+    $berkas_persyaratan_query = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
+    $data['berkas_persyaratan'] = [];
+
+    // Memeriksa dan menyesuaikan data jika properti format_surat tidak tersedia
+    foreach ($berkas_persyaratan_query as $item) {
+        $berkas = (array) $item;
+    if (property_exists($item, 'format_surat')) {
+        $berkas['format_surat'] = $item->format_surat;
+    } else {
+        // Menambahkan logika alternatif jika properti format_surat tidak tersedia
+        $berkas['format_surat'] = null; // Misalnya, diatur menjadi null
+    }
+    $data['berkas_persyaratan'][] = (object) $berkas;
+    }
+
 
     if ($request->jenis == 'pencabutan' || $request->jenis == 'pencabutan_pindah' ) {
       return view('Surat.pencabutan_surat', $data);
@@ -139,7 +155,7 @@ class SuratController extends Controller{
 
     $surat->id_user = $request->id_pemohon;
     $surat->id_jenis_surat = $request->id_jenis_surat;
-    $surat->nomor_surat      = 0;
+    $surat->nomor_surat      = '0';
 
 
      if ($request->pencabutan_pindah == 'true' && $request->id_surat != 0) {
@@ -151,9 +167,9 @@ class SuratController extends Controller{
         $surat->jenis_pengajuan            = $request->jenis_pengajuan;
       }
 
-      if(isset($request->perolehan_str)){
-        $surat->perolehan_str              = $request->perolehan_str;
-      }
+    //   if(isset($request->perolehan_str)){
+    //     $surat->perolehan_str              = $request->perolehan_str;
+    //   }
 
       $surat->id_jenis_sarana            = $surat_lama->id_jenis_sarana;
 

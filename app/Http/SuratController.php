@@ -58,7 +58,7 @@ class SuratController extends Controller{
     // return $request->id_surat;
     $data['surat'] = Surat::find($request->id_surat);
     $data['users'] = isset($request->id_surat) ? Users::find($data['surat']->id_user) : Users::find(Auth::getUser()->id);
-    
+
     $data['jenis_surat'] = isset($data['surat']) ? JenisSurat::find($data['surat']->id_jenis_surat) : JenisSurat::find(Auth::getUser()->id_jenis_surat);
     $data['list_surat'] = Surat::where('id_user', $data['users']->id)->where('status_aktif', 'Aktif')->orWhere('status_aktif', 'Menunggu')->where('id_user', $data['users']->id)->get();
     $data['list_jenis_sarana'] = JenisSarana::all();
@@ -73,7 +73,7 @@ class SuratController extends Controller{
     }else{
       $data['perpanjangan'] = '';
     }
-    
+
     if (isset($data['surat']) && $request->jenis != 'perpanjangan') {
       $data['syarat_persyaratan'] = SyaratPengajuan::where('id_surat', $data['surat']->id_surat)->get();
     }
@@ -90,19 +90,19 @@ class SuratController extends Controller{
     }
 
     if (!empty($request->id_surat) && $request->jenis == 'pencabutan_pindah') {
-      $persyratan_pindah_praktik = $data['jenis_surat']->syarat_pindah_tempat; 
+      $persyratan_pindah_praktik = $data['jenis_surat']->syarat_pindah_tempat;
 
       if (empty($persyratan_pindah_praktik)) {
         return ['status'=>'warning','code'=>500,'message'=>'Untuk Persyaratan Pindah Tempat praktek Tenaga Kesehatan '.$data['jenis_surat']->nama_surat. ' Mohon hubungi admin','data'=>''];
       }
 
       $data['pencabutan_pindah'] = 'true';
-      $data['berkas_persyaratan_baru'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_praktik)");  
+      $data['berkas_persyaratan_baru'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_praktik)");
     }else{
-      $data['pencabutan_pindah'] = 'false';      
+      $data['pencabutan_pindah'] = 'false';
     }
-    
-    $data['berkas_persyaratan'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");    
+
+    $data['berkas_persyaratan'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
 
     if ($request->jenis == 'pencabutan' || $request->jenis == 'pencabutan_pindah' ) {
       return view('Surat.pencabutan_surat', $data);
@@ -117,7 +117,7 @@ class SuratController extends Controller{
     // return $request->all();
     if ($request->id_surat == 0) {
       $id_jenis_surat = ($request->jenis == 'perpanjangan') ? Surat::find($request->id_surat)->id_jenis_surat : Auth::getUser()->id_jenis_surat;
-      $JenisSurat = JenisSurat::find($id_jenis_surat);    
+      $JenisSurat = JenisSurat::find($id_jenis_surat);
 
       $check_jumlah_str_didalam = Surat::where('nomor_str', $request->nomor_str)->where('status_aktif','Aktif')->get();
       $check_jumlah_str_diluar = SuratDiluar::where('nomor_str', $request->nomor_str)->where('status_aktif','Aktif')->get();
@@ -137,10 +137,10 @@ class SuratController extends Controller{
       $surat_asli = Surat::find($request->id_surat);
     }
 
-    $surat->id_user = $request->id_pemohon; 
-    $surat->id_jenis_surat = $request->id_jenis_surat;       
+    $surat->id_user = $request->id_pemohon;
+    $surat->id_jenis_surat = $request->id_jenis_surat;
     $surat->nomor_surat      = 0;
-        
+
 
     if ($request->pencabutan_pindah == 'true' && $request->id_surat != 0) {
 
@@ -175,7 +175,7 @@ class SuratController extends Controller{
 
 
       if ($request->pencabutan_pindah == 'false') {
-        $surat->status_aktif             = 'Dicabut';  
+        $surat->status_aktif             = 'Dicabut';
       }
 
     }
@@ -190,27 +190,27 @@ class SuratController extends Controller{
         $this->cetak_pdf($surat, $request->btn_type);
         $messages = "Preview";
         return [
-          'status'=>'success', 
-          'code'=>'200', 
-          'message'=>$messages, 
+          'status'=>'success',
+          'code'=>'200',
+          'message'=>$messages,
           'data'=>$surat
         ];
-      }else{   
-        // return "bawah";     
+      }else{
+        // return "bawah";
         return [
-          'status'=>'success', 
-          'code'=>'200', 
-          'message'=>'Data berhasil ditambahkan', 
+          'status'=>'success',
+          'code'=>'200',
+          'message'=>'Data berhasil ditambahkan',
           'data'=>$surat
         ];
       }
     }else{
       return [
-        'status'=>'success', 
-        'code'=>'500', 
-        'message'=>'Gagal', 
+        'status'=>'success',
+        'code'=>'500',
+        'message'=>'Gagal',
         'data'=>''
-      ];     
+      ];
     }
   }
 
@@ -262,11 +262,11 @@ class SuratController extends Controller{
       $surat->status_perpanjangan = 'Perpanjangan';
     }
 
-    if ($request->id_surat == 0 || $request->jenis == 'perpanjangan') { 
-      $surat->id_user = isset($surat_lama) ? $surat_lama->id_user : Auth::getUser()->id; 
+    if ($request->id_surat == 0 || $request->jenis == 'perpanjangan') {
+      $surat->id_user = isset($surat_lama) ? $surat_lama->id_user : Auth::getUser()->id;
     }
-    if ($request->id_surat == 0 || $request->jenis == 'perpanjangan') { 
-      $surat->id_jenis_surat = isset($surat_lama) ? $surat_lama->id_jenis_surat : Auth::getUser()->id_jenis_surat; 
+    if ($request->id_surat == 0 || $request->jenis == 'perpanjangan') {
+      $surat->id_jenis_surat = isset($surat_lama) ? $surat_lama->id_jenis_surat : Auth::getUser()->id_jenis_surat;
     }
     if ($request->id_surat == 0 || $request->jenis == 'perpanjangan') {
       $JenisSurat = JenisSurat::find(isset($surat_lama) ? $surat_lama->id_jenis_surat : Auth::getUser()->id_jenis_surat);
@@ -296,9 +296,9 @@ class SuratController extends Controller{
 
     if (!$request->has('status_simpan')) {
       $surat->status_simpan      = 'draf';
-    }elseif($request->status_simpan == 'Simpan' && $request->btn_type == 'preview'){      
+    }elseif($request->status_simpan == 'Simpan' && $request->btn_type == 'preview'){
       $surat->status_simpan      = 'preview';
-    }else {      
+    }else {
       $surat->status_simpan      = 'simpan';
     }
     // return $surat->status_simpan;
@@ -416,9 +416,9 @@ class SuratController extends Controller{
         $this->cetak_pdf($surat, $request->btn_type);
         $messages = "Preview";
         return [
-          'status'=>'success', 
-          'code'=>'200', 
-          'message'=>$messages, 
+          'status'=>'success',
+          'code'=>'200',
+          'message'=>$messages,
           'data'=>$surat
         ];
       }else{
@@ -428,17 +428,17 @@ class SuratController extends Controller{
         // ->with('message', 'Data berhasil ditambahkan')
         // ->with('data', 'success');
         return [
-          'status'=>'success', 
-          'code'=>'200', 
-          'message'=>'Data berhasil ditambahkan', 
+          'status'=>'success',
+          'code'=>'200',
+          'message'=>'Data berhasil ditambahkan',
           'data'=>$surat
         ];
       }
     }else{
       return [
-        'status'=>'success', 
-        'code'=>'500', 
-        'message'=>'Gagal', 
+        'status'=>'success',
+        'code'=>'500',
+        'message'=>'Gagal',
         'data'=>''
       ];
 
@@ -487,7 +487,7 @@ class SuratController extends Controller{
     if ($saved) {
       $persyratan = JenisSurat::find($surat->id_jenis_surat)->syarat_pencabutan;
       $berkas_persyaratan = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
-      
+
       foreach ($berkas_persyaratan as $row) {
         if (!empty($request->file($row->nama_variable))) {
           $ext                                  = $request->file($row->nama_variable)->getClientOriginalExtension();
@@ -513,7 +513,7 @@ class SuratController extends Controller{
           $surat_lama = Surat::find($request->id_surat);
           // return $surat_lama;
           $surat_baru = new Surat();
-          $surat_baru->id_user                    = Auth::getUser()->id; 
+          $surat_baru->id_user                    = Auth::getUser()->id;
           $surat_baru->id_jenis_surat             = $surat_lama->id_jenis_surat;
           $surat_baru->id_jenis_praktik           = $surat_lama->id_jenis_praktik;
           $surat_baru->id_jenis_sarana            = $surat_lama->id_jenis_sarana;
@@ -547,14 +547,14 @@ class SuratController extends Controller{
 
                 $lowercase_nama_file = strtolower($value->nama_file_persyaratan);
                 $exploded_nama_file = explode('_', $lowercase_nama_file);
-                $syarat_pengajuan_baru->nama_file_persyaratan = $value->nama_file_persyaratan;                
+                $syarat_pengajuan_baru->nama_file_persyaratan = $value->nama_file_persyaratan;
 
                 $syarat_pengajuan_baru->disetujui_admin     = 'Menunggu';
                 $syarat_pengajuan_baru->disetujui_kasi      = 'Menunggu';
                 $syarat_pengajuan_baru->disetujui_kabid     = 'Menunggu';
                 $syarat_pengajuan_baru->disetujui_kadinkes  = 'Menunggu';
-                $syarat_pengajuan_baru->save();                
-              }  
+                $syarat_pengajuan_baru->save();
+              }
             }
 
             // upload file pindah tempat praktik
@@ -627,33 +627,33 @@ class SuratController extends Controller{
   }
 
   public function detail(Request $request){
-    
+
     $data['surat'] = Surat::find($request->id);
-    
+
     $cekAuth = Users::where('id_level_user',8)
     ->where('id',Auth::getUser()->id)
-    ->first();    
+    ->first();
 
     $data['warning'] = false;
-    if (!empty($data['surat']->verifikator_pengajuan_id) && $cekAuth) {      
+    if (!empty($data['surat']->verifikator_pengajuan_id) && $cekAuth) {
       if ($cekAuth->id != $data['surat']->verifikator_pengajuan_id) {
         $data['warning'] = true;
         // return [
-        //     'status'=>'warning', 
-        //     'code'=>'500', 
-        //     'message'=> 'Maaf! Pengajuan Ini Sudah di Verifikasi oleh Admin Permohonan Lainnya', 
+        //     'status'=>'warning',
+        //     'code'=>'500',
+        //     'message'=> 'Maaf! Pengajuan Ini Sudah di Verifikasi oleh Admin Permohonan Lainnya',
         //     'data'=>''
         //   ];
       }
-      
+
     }
 
 
     // $getNomorSIP = Surat::where('id_jenis_surat',$data['surat']->id_jenis_surat)
     // ->whereYear('tanggal_pengajuan', date('Y',strtotime($data['surat']->tanggal_pengajuan)))
     // ->where('id_jenis_praktik', $data['surat']->id_jenis_praktik)
-    // ->max('nomor_surat');        
-    // $data['no_urut'] = sprintf("%03d",(string)$getNomorSIP+1);    
+    // ->max('nomor_surat');
+    // $data['no_urut'] = sprintf("%03d",(string)$getNomorSIP+1);
 
 
     $data['users'] = isset($request->id) ? Users::find($data['surat']->id_user) : Users::find(Auth::getUser()->id);
@@ -667,9 +667,9 @@ class SuratController extends Controller{
       $persyratan = $data['jenis_surat']->syarat_perpanjangan;
     }
 
-    if (!empty($data['surat']->surat_sebelum_id)) {      
-      $persyratan_pindah_tempat = $data['jenis_surat']->syarat_pindah_tempat; 
-      
+    if (!empty($data['surat']->surat_sebelum_id)) {
+      $persyratan_pindah_tempat = $data['jenis_surat']->syarat_pindah_tempat;
+
       $data['syarat_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");
 
       foreach ($data['syarat_persyaratan_pindah_tempat'] as $key => $sp) {
@@ -681,7 +681,7 @@ class SuratController extends Controller{
         }
       }
 
-      $data['berkas_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");      
+      $data['berkas_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");
 
     }
 
@@ -694,7 +694,7 @@ class SuratController extends Controller{
         } else {
           $sp->syarat_pengajuan = Null;
         }
-      }      
+      }
     }
 
     $data['berkas_persyaratan'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
@@ -718,9 +718,9 @@ class SuratController extends Controller{
     $persyratan = $data['jenis_surat']->syarat_pencabutan;
     $data['berkas_persyaratan'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan)");
 
-    if (!empty($surat_permohonan_pindah_tempat->id_surat)) {      
-      $persyratan_pindah_tempat = $data['jenis_surat']->syarat_pindah_tempat; 
-      
+    if (!empty($surat_permohonan_pindah_tempat->id_surat)) {
+      $persyratan_pindah_tempat = $data['jenis_surat']->syarat_pindah_tempat;
+
       $data['syarat_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");
 
       foreach ($data['syarat_persyaratan_pindah_tempat'] as $key => $sp) {
@@ -732,9 +732,9 @@ class SuratController extends Controller{
         }
       }
 
-      $data['berkas_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");   
+      $data['berkas_persyaratan_pindah_tempat'] = DB::select("SELECT * FROM `jenis_persyaratan` WHERE `id_jenis_persyaratan` IN ($persyratan_pindah_tempat)");
 
-      $data['surat_permohonan_baru_id'] = $surat_permohonan_pindah_tempat->id_surat;   
+      $data['surat_permohonan_baru_id'] = $surat_permohonan_pindah_tempat->id_surat;
 
     }
     $content = view('Surat.detail_pencabutan_surat', $data)->render();
@@ -924,7 +924,7 @@ class SuratController extends Controller{
     $JenisSurat = JenisSurat::find($surat->id_jenis_surat);
     $tahun = substr($surat->tanggal_berlaku_str,0,4);
     $surat->keterangan                 = $request->keterangan;
-    
+
 
     if ($request->status_verifikasi == "Ditolak") {
       $surat->status_aktif       = 'Tolak';
@@ -953,7 +953,7 @@ class SuratController extends Controller{
     if (in_array($users->id_level_user, [1,8])) {
       $surat->disetujui_admin          = $request->status_verifikasi;
       $surat->tanggal_disetujui_admin  = date('Y-m-d H:i:s');
-      $surat->tanggal_terbit        = date('Y-m-d H:i:s');     
+      $surat->tanggal_terbit        = date('Y-m-d H:i:s');
       if ($tahun == '2100') {
         $surat->tanggal_kedaluarsa = date('Y-m-d',strtotime('+5 Years',strtotime($surat->tanggal_terbit )));
       }
@@ -993,9 +993,9 @@ class SuratController extends Controller{
                             ->where('status_aktif','!=','Tolak')
                             ->first()->nomor_surat;
                             // ->max('nomor_surat_int');
-                            
-      $nomor_SIP = sprintf("%03d",(string)$getNomorSIP+1);    
-      // $nomor_SIP = sprintf("%04d",(string)$getNomorSIP+1);    
+
+      $nomor_SIP = sprintf("%03d",(string)$getNomorSIP+1);
+      // $nomor_SIP = sprintf("%04d",(string)$getNomorSIP+1);
 
       $surat->disetujui_kabid = $request->status_verifikasi;
       $surat->tanggal_disetujui_kabid   = date('Y-m-d H:i:s');
@@ -1012,7 +1012,7 @@ class SuratController extends Controller{
       }else{
         $surat->status_aktif          = 'Aktif';
         $surat->nomor_surat           = $nomor_SIP;
-      }      
+      }
 
       $SyaratPengajuan = SyaratPengajuan::where('id_surat', $surat->id_surat)
       ->update([
@@ -1241,7 +1241,7 @@ class SuratController extends Controller{
         $data['content'] = TemplateSurat::where('id_jenis_surat', $surat->id_jenis_surat)->where('id_jenis_praktik', $surat->id_jenis_praktik)->where('jenis', 'PENCABUTAN')->first()->template_surat;
       }else{
         $data['content'] = TemplateSurat::where('id_jenis_surat', $surat->id_jenis_surat)->where('id_jenis_praktik', $surat->id_jenis_praktik)->where('jenis', 'PENGAJUAN')->first()->template_surat;
-      }    
+      }
 
       //data users
       $nama = '';
@@ -1331,7 +1331,7 @@ class SuratController extends Controller{
       // $data['content'] = str_replace('[[nama-kadinkes]]', $ttd_kadinkes->nama, $data['content']);
       // $data['content'] = str_replace('[[nip-kadinkes]]', $ttd_kadinkes->nip, $data['content']);
       // $data['content'] = str_replace('[[jabatan-kadinkes]]', $ttd_kadinkes->jabatan, $data['content']);
-      
+
 
       // $data['content'] = str_replace('[[berlaku-sampai]]', $surat->status_aktif == 'Aktif' ? 'berlaku sampai dengan tanggal '.Formatters::tgl_indo($surat->tanggal_kedaluarsa) : 'belum berlaku.', $data['content']);
 
@@ -1386,7 +1386,7 @@ class SuratController extends Controller{
         $data['content'] = str_replace('[[paraf-kabid]]', public_path('/img/blank_kabid.png'), $data['content']);
         $data['content'] = str_replace('[[paraf-kadinkes]]', public_path('/img/blank_ttd.png'), $data['content']);
         $data['content'] = str_replace('[[stempel-dinkes]]', public_path('/img/blank_stempel.png'), $data['content']);
-        // qrcode [[qrcode]]        
+        // qrcode [[qrcode]]
         // $data['content'] = str_replace('[[logo-dinkes]]', public_path('/img/KOP SIP besar.png'), $data['content']);
         $data['content'] = str_replace('[[logo-dinkes]]', public_path('/img/KOPSIPbesar.png'), $data['content']);
 
@@ -1441,7 +1441,7 @@ class SuratController extends Controller{
         $data['url_surat_asli'] = url('/').'/upload/file_sip_asli/'.$file_name_asli;
         $data['jenis_file'] = 'asli';
 
-        if ($type == 'ajukan' || $type == '') {          
+        if ($type == 'ajukan' || $type == '') {
           $data['content'] = str_replace("[[qrcode]]", 'data:image/png;base64, {!! '.base64_encode(QrCode::format('svg')->encoding('UTF-8')->size(100)->errorCorrection('H')->generate($data['url_surat_asli'])).' !!}',  $data['content']);
         }
 
@@ -1470,12 +1470,12 @@ class SuratController extends Controller{
           $data['content'] = str_replace(public_path('/img/blank_stempel.png'), public_path('/upload/file_master/').$JenisSurat->stempel_dinkes, $data['content']);
         }
 
-        if ($type == 'ajukan') {  
+        if ($type == 'ajukan') {
           $data['content'] = str_replace("[[qrcode]]", 'data:image/png;base64, {!! '.base64_encode(QrCode::format('svg')->size(100)->errorCorrection('H')->generate($data['url_surat_salinan'])).' !!}',  $data['content']);
         }
-        
+
         $pdf = PDF::loadView('Surat.print_pdf', $data)->setPaper([0, 0, 609.4488, 935.433], 'portrait');
-        
+
         $pdf->save(public_path('upload/file_sip_salinan/').$file_name_salinan);
 
         if ($surat->status_aktif == 'Dicabut' || $surat->status_aktif == 'Menunggu Pencabutan') {
@@ -1493,24 +1493,24 @@ class SuratController extends Controller{
     {
 
       // return $request->id_surat_preview;
-      $surat = SuratTemp::find($request->id_surat_preview);      
-      
+      $surat = SuratTemp::find($request->id_surat_preview);
+
       if (!empty($surat)) {
         if(file_exists(public_path("upload/file_sip_salinan/$surat->file_surat_sip_salinan"))){
-          unlink(public_path("upload/file_sip_salinan/$surat->file_surat_sip_salinan"));                  
+          unlink(public_path("upload/file_sip_salinan/$surat->file_surat_sip_salinan"));
         }
-        if(file_exists(public_path("upload/file_sip_asli/$surat->file_surat_sip_asli"))){        
-          unlink(public_path("upload/file_sip_asli/$surat->file_surat_sip_asli"));         
-        }        
+        if(file_exists(public_path("upload/file_sip_asli/$surat->file_surat_sip_asli"))){
+          unlink(public_path("upload/file_sip_asli/$surat->file_surat_sip_asli"));
+        }
 
         if (!empty($surat->sip_1)) {
-          if(file_exists(public_path("uploads/file_berkas/$surat->sip_1"))){        
-            unlink(public_path("uploads/file_berkas/$surat->sip_1"));          
-          }                  
+          if(file_exists(public_path("uploads/file_berkas/$surat->sip_1"))){
+            unlink(public_path("uploads/file_berkas/$surat->sip_1"));
+          }
         }
 
         if (!empty($surat->sip_2)) {
-          if(file_exists(public_path("uploads/file_berkas/$surat->sip_2"))){        
+          if(file_exists(public_path("uploads/file_berkas/$surat->sip_2"))){
             unlink(public_path("uploads/file_berkas/$surat->sip_2"));
           }
         }
@@ -1519,7 +1519,7 @@ class SuratController extends Controller{
         // $filenames = $SyaratPengajuan->get()->pluck("nama_file_persyaratan");
 
         // if (count($filenames) > 0) {
-        //   $SyaratPengajuan->delete(); 
+        //   $SyaratPengajuan->delete();
         //   foreach ($filenames as $key => $value) {
         //     // do delete file here
         //     if(file_exists(public_path("upload/file_berkas/$value"))){
@@ -1528,7 +1528,7 @@ class SuratController extends Controller{
         //   }
         // }
 
-        $surat->delete();        
+        $surat->delete();
       }
 
     }

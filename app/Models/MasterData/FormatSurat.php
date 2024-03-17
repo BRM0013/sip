@@ -28,14 +28,16 @@ class FormatSurat extends Model{
 		$datagrid = new Datagrid;
 		$data = $datagrid->datagrid_query($param, function($data) use ($input){
 			if (Auth::getUser()->id_level_user != 2) {
-				return $data->leftjoin('jenis_surat as jns','jns.id_jenis_surat','fs.jenis_surat_id')			
+				return $data->leftjoin('jenis_surat as jns','jns.id_jenis_surat','fs.jenis_surat_id')
 						->orderby('id_format_surat', 'ASC');
 			}else{
-				return $data->leftjoin('jenis_surat as jns','jns.id_jenis_surat','fs.jenis_surat_id')			
+				return $data->leftjoin('jenis_surat as jns','jns.id_jenis_surat','fs.jenis_surat_id')
 							->where('fs.jenis_surat_id', Auth::getUser()->id_jenis_surat)
 							->orderby('id_format_surat', 'ASC');
 			}
 		});
 		return $data;
+
+
 	}
 }

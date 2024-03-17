@@ -4,13 +4,16 @@
   $keterangan_surat      = '';
   $nama_file_surat      = '';
   $id_jenis_surat     = '';
+  $id_jenis_persyaratan     = '';
 
   if (isset($data_format)) {
     $id_format_surat      = $data_format->id_format_surat;
     $id_jenis_surat      = $data_format->jenis_surat_id;
     $nama_surat          = $data_format->nama;
     $keterangan_surat    = $data_format->keterangan;
-    $nama_file_surat     = $data_format->nama_file;    
+    $nama_file_surat     = $data_format->nama_file;
+    $id_jenis_persyaratan     = $data_format->id_jenis_persyaratane;
+    $nama_jenis_persyaratan    = $data_format->nama_jenis_persyaratan;
   }
 ?>
 
@@ -32,7 +35,7 @@
                              <input type="hidden" name="id_format_surat" value="{{ $id_format_surat }}">
                             <div class="row">
                               <div class="col-md-12">
-                                
+
                                 <div class="form-group">
                                   <label class="col-sm-12 control-label">Nama Format Surat</label>
                                   <div class="col-sm-12">
@@ -56,11 +59,24 @@
                                       <option value="" disabled selected>::. Pilih Jenis Surat .::</option>
                                       @foreach ($jenis_surat as $key)
                                         <option value="{{$key->id_jenis_surat}}" @if($id_jenis_surat == $key->id_jenis_surat) selected @endif>{{$key->nama_surat}}</option>
-                                      @endforeach                                     
+                                      @endforeach
                                     </select>
                                   </div>
                                 </div>
                                 <div class="clearfix" style="margin-bottom: 10px;"></div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">Jenis Persyaratan (SIP)</label>
+                                    <div class="col-sm-12">
+                                      <select class="form-control" name="id_jenis_persyaratan">
+                                        <option value="" disabled selected>::. Pilih Jenis Persyaratan .::</option>
+                                        @foreach ($jenis_persyaratan as $key)
+                                          <option value="{{$key->id_jenis_persyaratan}}" @if($id_jenis_persyaratan == $key->id_jenis_persyaratan) selected @endif>{{$key->nama_jenis_persyaratan}}</option>
+                                        @endforeach
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="clearfix" style="margin-bottom: 10px;"></div>
 
                                 <div class="form-group">
                                   <label class="col-sm-12 control-label">Upload Format Surat <small style="color:red">* Maksimal 2 MB</small></label>
@@ -85,7 +101,7 @@
                                 <span style="margin-right: 5px;" class="fa fa-chevron-left"></span> Kembali
                               </button>
                             </div>
-                           </form> 
+                           </form>
                           </div>
                         </div>
                       </div>
@@ -106,9 +122,9 @@
     })();
     $('#detail-dialog').on('hidden.bs.modal', function () {
         $('.modal-dialog').html('');
-    }) 
+    })
 
-    function cekHuruf(evt) { 
+    function cekHuruf(evt) {
       var charCode = (evt.which) ? evt.which : event.keyCode
       if ((charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122) || charCode == 32 || charCode == 46 || charCode == 64 || charCode == 39)
         return true;
@@ -121,7 +137,7 @@
       if(input.files && input.files.length == 1){
         if (input.files[0].size > 2097152) {
           $('#info-nama_file').css('display', 'block');
-          $('#button-simpan').attr('disabled', 'disabled');          
+          $('#button-simpan').attr('disabled', 'disabled');
           return false;
         }
       }
@@ -130,11 +146,11 @@
     }
 
      $('input[type=file]').on('change',function (e) {
-        var extValidation = new Array(".pdf");
+        var extValidation = new Array(".pdf", ".docx", ".xlsx");
         var fileExt = e.target.value;
         fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
         if (extValidation.indexOf(fileExt) < 0) {
-            swal('Extensi File Tidak Valid !','Upload file bertipe .pdf, untuk dapat melakukan upload data...','warning')
+            swal('Extensi File Tidak Valid !', 'Upload file bertipe .pdf, .docx, atau .xlsx untuk dapat melakukan upload data...', 'warning')
             $(this).val("")
             return false;
         }

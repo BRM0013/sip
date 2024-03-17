@@ -2,11 +2,11 @@
 @section('content')
 
 <?php
-  $photo                  = '';  
+  $photo                  = '';
 
   if (isset($users)) {
     $photo = url('/').'/upload/users/'.$users->photo;
-    $id    = $users->id;         
+    $id    = $users->id;
   }
 ?>
 
@@ -28,27 +28,27 @@
             <input name="photo" accept="image/*" onchange="loadFile(event)" style="width: 150px;" type="file" class="form-control input-sm" @if(empty($photo))@endif>
             <i style="color:red">Ukuran maks 2 MB</i>
           </div>
-          
+
           <div class="clearfix"></div>
           <div class="clearfix" style="border-bottom: solid 1px #d2d6de"></div>
-          
+
           <?php $x = 0; ?>
-           @foreach ($list_surat as $key)              
+           @foreach ($list_surat as $key)
             <?php
             $no = 1;
             ?>
-            <input type="hidden" name="id_surat[]" value="{{ $key->id_surat }}">   
-            <div class="col-md-6 col-xs-12">            
-              
+            <input type="hidden" name="id_surat[]" value="{{ $key->id_surat }}">
+            <div class="col-md-6 col-xs-12">
+
               <h5 style="font-weight: bold;">Upload Dokumen Pendukung SIP ke {{$key->sip_ke}}</h5>
 
               @if (count($key->row) > 0)
                 @foreach ($key->row as $syarat_pengajuan)
                 <label class="col-sm-12 control-label">
-                  {{ $no }}. {{ $syarat_pengajuan->nama_jenis_persyaratan }}                  
+                  {{ $no }}. {{ $syarat_pengajuan->nama_jenis_persyaratan }}
                   <span class="colorRed">* Maksimal 2MB</span>
                 </label>
-                
+
                 <input style="border: solid 1px #d2d6de; padding: 5px;" accept="<?php echo $syarat_pengajuan->jenis_input; ?>" type="file" onchange="checkSize('{{ str_replace('/', '_', $syarat_pengajuan->nama_variable) }}_{{ $no }}_{{ $x }}')" id="{{ str_replace('/', '_', $syarat_pengajuan->nama_variable) }}_{{ $no }}_{{ $x }}" name="<?php echo $syarat_pengajuan->nama_variable; ?>[]" class="form-control input-sm input-berkas-pengajuan" required="">
 
                  <span id="info-file-{{ str_replace('/', '_', $syarat_pengajuan->nama_variable) }}_{{ $no }}_{{ $x }}" style="color:red; display:none;">File yang anda masukan lebih dari 2MB</span>
@@ -68,9 +68,9 @@
                   <?php endif ?>
                   <?php $no++ ?>
                 @endforeach
-                <div class="clearfix" style="border-bottom: solid 1px #d2d6de"></div>
+                 <div class="clearfix" style="border-bottom: solid 1px #d2d6de"></div>
               @endif
-            </div>           
+            </div>
               <?php $x++; ?>
            @endforeach
             <div class="clearfix"></div>
@@ -83,20 +83,20 @@
                  <b style="color: red;">lanjutkan untuk menekan tombol Simpan Validasi.</b>
                   Jika Semua <b style="color: red;">*File Terlampir </b> Sudah Benar, lanjutkan untuk menekan tombol Simpan Validasi.
                 </label>
-              </br>              
+              </br>
             </div>
           </div> -->
-         
+
          <div class="box-footer">
             <button id="button-submit-sip" type="submit" class="btn btn-primary pull-right btn-simpan btn-sm" style="margin-left: 15px;">Upload Berkas
               <span style="margin-left: 5px;" class="fa fa-save"></span>
-            </button>            
+            </button>
              <!-- <button id="button-submit-validasi" type="submit" class="btn btn-primary pull-right btn-simpan btn-sm" style="margin-left: 15px;">Simpan Validasi
               <span style="margin-left: 5px;" class="fa fa-save"></span>
-            </button> -->                          
+            </button> -->
               <a href="{{ route('home') }}" class="btn btn-warning btn-cencel pull-right">
                 <span style="margin-right: 5px;" class="fa fa-chevron-left"></span> Kembali
-              </a>            
+              </a>
          </div>
 
       </form>
@@ -139,13 +139,13 @@
    //       // $('#button-submit-validasi').show();
    //       $('#button-kembali').show()
 
-   //       $('input[name=nama_variable').attr('required','required');        
+   //       $('input[name=nama_variable').attr('required','required');
    //     }else{
    //       $('#button-submit-sip').show();
    //       // $('#button-submit-validasi').hide();
    //       $('#button-kembali').show()
 
-   //       $('input[name=nama_variable').removeAttr('required');        
+   //       $('input[name=nama_variable').removeAttr('required');
    //     }
    //   }
 
@@ -163,7 +163,7 @@
       }
   })
 
-  function checkSize(input_id){   
+  function checkSize(input_id){
     const fi = document.getElementById(input_id);
     if (fi.files.length > 0) {
         for (const i = 0; i <= fi.files.length - 1; i++) {

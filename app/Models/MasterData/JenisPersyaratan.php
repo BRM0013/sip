@@ -33,4 +33,11 @@ class JenisPersyaratan extends Model{
 		});
 		return $data;
 	}
+
+    public function berkasPersyaratan()
+    {
+        return $this->belongsTo(BerkasPersyaratan::class, 'id_jenis_persyaratan');
+    }
 }
+
+
